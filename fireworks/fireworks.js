@@ -43,27 +43,32 @@ class Firework {
     this.targetY = targetY;
     this.angle = Math.atan2( targetY - y, targetX - x );
     this.color = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
-    this.acceleration = 1.02;
+    this.acceleration = 1.05;
     this.yVelocity = config.VELOCITY;
-    this.xVelocity = this.angle ? config.VELOCITY: 0;
 
+    const howManyXforEachY = (this.targetX - this.x) / (this.targetY - this.y); // maybe slope - don't remember?
+    // how many x's are in a y?
+    const xVelocity = this.yVelocity  * howManyXforEachY;   
+    this.xVelocity = this.angle ? xVelocity: 0;
   }
 
   calculateVelocity = () => {
     if(isNaN(this.angle)) {
       return {x: 0, y: this.yVelocity *= this.acceleration} 
     } 
-    debugger;
     return { 
-      x: this.xVelocity = this.xVelocity * this.acceleration + Math.cos(this.angle), 
-      y: this.yVelocity = this.yVelocity * this.acceleration + Math.abs(Math.sin(this.angle)), 
+      // wrong, but fun, way to make the firework go to your mouse coordinates
+      // x: this.xVelocity = this.xVelocity * this.acceleration + Math.cos(this.angle), 
+      // y: this.yVelocity = this.yVelocity * this.acceleration + Math.abs(Math.sin(this.angle)), 
+      x: this.xVelocity *= this.acceleration,
+      y: this.yVelocity *= this.acceleration
     } 
   };
 
   update = (index, ctx) => {
     const {x:xVelocity, y:yVelocity} = this.calculateVelocity()
     this.y -= yVelocity; // move up!
-    this.x += xVelocity; // move over!
+    this.x -= xVelocity; // move over!
     
     if( 
       this.y < random(ctx.canvas.height * .3, ctx.canvas.height * .2) // too hight
