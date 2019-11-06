@@ -36,25 +36,43 @@ const config = {
 }
 
 class Firework {
-  constructor(x, y) {
+  constructor(x, y, targetX, targetY) {
     this.x = x;
     this.y = y;
+    this.targetX = targetX;
+    this.targetY = targetY;
+    this.angle = Math.atan2( targetY - y, targetX - x );
     this.color = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
     this.acceleration = 1.02;
-    this.velocity = config.VELOCITY;
+    this.yVelocity = config.VELOCITY;
+    this.xVelocity = this.angle ? config.VELOCITY: 0;
+
   }
 
-  calculateVelocity = () => (
-    this.velocity *= this.acceleration
-  );
+  calculateVelocity = () => {
+    if(isNaN(this.angle)) {
+      return {x: 0, y: this.yVelocity *= this.acceleration} 
+    } 
+    debugger;
+    return { 
+      x: this.xVelocity = this.xVelocity * this.acceleration + Math.cos( this.angle ), 
+      y: this.yVelocity = this.yVelocity * this.acceleration + Math.abs(Math.sin(this.angle)), 
+    } 
+  };
 
   update = (index, ctx) => {
-    this.y -= this.calculateVelocity()// move up!
-    if(this.y < ctx.canvas.height * .2) {
+    const {x:xVelocity, y:yVelocity} = this.calculateVelocity()
+    this.y -= yVelocity; // move up!
+    this.x += xVelocity; // move over!
+    
+    if( 
+      this.y < random(ctx.canvas.height * .3, ctx.canvas.height * .2) // too hight
+      || (this.angle && this.x < ctx.canvas.width * .2) //
+      || ((this.angle && this.x > ctx.canvas.width * .8))
+      ) 
+    {
       config.fireworks.splice(index, 1);
-      console.log('exploding')
       for(let i = 0; i < config.MAX_EXPLOSION_PARTICLES; i++) {
-        console.log(`Creating particle num: ${i}`)
         config.pixels.push(new Pixel(this.x, this.y, this.color, true))
       }
       return true;
@@ -80,7 +98,7 @@ class Pixel {
     this.exploding = exploding;
     this.gravity = 1;
     // for exploding particles
-    this.angle = random( 0, Math.PI * 2 );
+    this.angle = random(0, Math.PI * 2); // random angle in a circle
     this.speed = random( 1, 10 ) + config.VELOCITY;
   }
 
@@ -106,9 +124,9 @@ class Pixel {
 }
 
 
-const addFirework = (x) => {
+const addFirework = (x, y, targetX, targetY) => {
   if(typeof x === 'undefined') x = config.context.canvas.width / 2;
-  config.fireworks.push(new Firework(x, config.context.canvas.height))
+  config.fireworks.push(new Firework(x, config.context.canvas.height, targetX, targetY))
 }
 
 const processFireworks = () => {
@@ -137,7 +155,7 @@ const gameLoop = () => {
         lastRender = timestamp;
         if( config.limiterCount >= config.limiterTotal ) {
           if( config.mousedown ) {
-            addFirework(config.mouse.x);
+            addFirework(config.context.canvas.width / 2, config.context.canvas.height, config.mouse.x, config.mouse.y);
             config.limiterCount = 0;
           }
         } else {
