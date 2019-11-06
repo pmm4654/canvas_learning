@@ -55,7 +55,7 @@ class Firework {
     } 
     debugger;
     return { 
-      x: this.xVelocity = this.xVelocity * this.acceleration + Math.cos( this.angle ), 
+      x: this.xVelocity = this.xVelocity * this.acceleration + Math.cos(this.angle), 
       y: this.yVelocity = this.yVelocity * this.acceleration + Math.abs(Math.sin(this.angle)), 
     } 
   };
@@ -67,8 +67,8 @@ class Firework {
     
     if( 
       this.y < random(ctx.canvas.height * .3, ctx.canvas.height * .2) // too hight
-      || (this.angle && this.x < ctx.canvas.width * .2) //
-      || ((this.angle && this.x > ctx.canvas.width * .8))
+      || (this.angle && this.x < random(ctx.canvas.width * .2, ctx.canvas.width * .1)) //
+      || (this.angle && this.x > random(ctx.canvas.width * .8, ctx.canvas.width * .9))
       ) 
     {
       config.fireworks.splice(index, 1);
