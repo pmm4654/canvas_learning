@@ -18,10 +18,10 @@ const random = ( min, max ) => {
 }
 
 const config = {
-  VELOCITY: 4,
+  VELOCITY: 3,
   PARTICLE_SIZE: 4,
   context: setupCanvasContext(),
-  MAX_EXPLOSION_PARTICLES: 40,
+  MAX_EXPLOSION_PARTICLES: 80,
   // firework collection
   fireworks: [],
   // particle collection
@@ -43,7 +43,7 @@ class Firework {
     this.targetY = targetY;
     this.angle = Math.atan2( targetY - y, targetX - x );
     this.color = 'rgb(' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ',' + (Math.floor(Math.random() * 256)) + ')';
-    this.acceleration = 1.05;
+    this.acceleration = 1.02;
     this.yVelocity = config.VELOCITY;
 
     const howManyXforEachY = (this.targetX - this.x) / (this.targetY - this.y); // maybe slope - don't remember?
@@ -150,8 +150,8 @@ const gameLoop = () => {
   addFirework()
   let lastRender = null;
   const animate = (timestamp) => {
-    const delta = lastRender ? timestamp - lastRender : 60;
-    const renders = Math.floor(delta /  30); // ms passed / frames per second 
+    const delta = lastRender ? timestamp - lastRender : 32;
+    const renders = Math.floor(delta /  (1000/60)); // ms passed / frames per second 
     if(renders > 0) {
       config.context.fillStyle = '#000';
       config.context.clearRect(0,0,config.context.canvas.width, config.context.canvas.width)
