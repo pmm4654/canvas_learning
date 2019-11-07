@@ -3,8 +3,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight * .8;
 
 const context = canvas.getContext('2d');
-
-const NUM_CIRCLES = 90;
+context.globalCompositeOperation  = 'soft-light';
+const NUM_CIRCLES = 700;
 
 const mouse = {
   x: undefined,
@@ -16,31 +16,67 @@ window.addEventListener('mousemove', (e) => {
   mouse.y = e.y
 });
 
+const colorArray = [
+  '#ffaa33',
+  '#99ffaa',
+  '#00ff00',
+  '#4411aa',
+  '#ff1100'
+];
+
+
+tropicalFishPalette = [
+  '#0D0D0D',
+  '#A68B03',
+  '#4227F2',
+  '#2405F2',
+  '#6503A6',
+];
+
+const jellyFishPalette = [
+  '#1D16F2',
+  '#040DBF',
+  '#03178C',
+  '#010626',
+  '#021859',
+];
+
+const zebraFishPalette = [
+  '#5005F2',
+  '#1D04BF',
+  '#15038C',
+  '#050259',
+  '#010440',
+];
+
+
 class Circle {
-  constructor(x, y) {
+  constructor(x, y, colorPalette = colorArray) {
     this.x = x;
     this.y = y;
-    this.radius = Math.random() * 50;
+    this.color = colorPalette[Math.floor(Math.random() * colorArray.length)]
+    this.radius = Math.random() * 20 + 1;
     this.initialRadius = this.radius;
-    this.maxRadius = this.radius * 2;
-    this.xVelocity = Math.floor((Math.random() - 0.5) * 18);
-    this.yVelocity = Math.floor((Math.random() - 0.5) * 18);
+    this.maxRadius = this.radius * 9;
+    this.xVelocity = Math.floor((Math.random() - 0.5) * 3);
+    this.yVelocity = Math.floor((Math.random() - 0.5) * 3);
+    this.distanceFromMouse = 100;
   }
 
   isCloseToMouse = (axis = 'x') => (
-    mouse[axis] - this[axis] < 50 && mouse[axis] - this[axis] > -50
+    mouse[axis] - this[axis] < this.distanceFromMouse && mouse[axis] - this[axis] > -this.distanceFromMouse
   )
 
   draw = (context) => {
     if(this.isCloseToMouse('x') && this.isCloseToMouse('y')) {
-      this.radius = Math.min(this.radius + 10, this.maxRadius);
+      this.radius = Math.min(this.radius + 2, this.maxRadius);
     } else {
-      this.radius = Math.max(this.radius - 10, this.initialRadius);
+      this.radius = Math.max(this.radius - 2, this.initialRadius);
     }
     context.beginPath(); // if you don't have this, it will connect the previous line to the circle
+    context.fillStyle = this.color;
     context.arc(this.x, this.y, this.radius, Math.PI * 2, false);
-    context.strokeStyle = 'blue';
-    context.stroke();
+    context.fill();
   }
 
   update = (context) => {      
@@ -63,8 +99,27 @@ class Circle {
   }
 }
 
-const newCircle = () => new Circle(Math.floor(Math.random() * context.canvas.width), Math.floor(Math.random() * context.canvas.height));
-const circles = new Array(NUM_CIRCLES).fill(0).map((circle, i) => newCircle())
+const newCircle = (colorPalette) => new Circle(
+  Math.floor(Math.random() * context.canvas.width), 
+  Math.floor(Math.random() * context.canvas.height),
+  colorPalette
+);
+let circles = []
+
+const init = () => {
+  circles = [];
+  circles = new Array(NUM_CIRCLES).fill(0).map((circle, i) => newCircle(zebraFishPalette))
+  for(const circle of circles) {
+    circle.update(context)
+    circle.draw(context)
+  }
+}
+
+window.addEventListener('resize', (e) => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight * .8;
+  init();
+})
 
 const animate = () => {
   requestAnimationFrame(animate);
@@ -76,3 +131,4 @@ const animate = () => {
 }
 
 animate();
+init();
