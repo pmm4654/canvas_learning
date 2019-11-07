@@ -3,7 +3,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight * .8;
 
 const context = canvas.getContext('2d');
-context.globalCompositeOperation  = 'soft-light';
+// context.globalCompositeOperation  = 'soft-light';
 const NUM_CIRCLES = 700;
 
 const mouse = {
@@ -57,7 +57,7 @@ class Circle {
     this.color = colorPalette[Math.floor(Math.random() * colorArray.length)]
     this.radius = Math.random() * 20 + 1;
     this.initialRadius = this.radius;
-    this.maxRadius = this.radius * 9;
+    this.maxRadius = this.radius * 7;
     this.xVelocity = Math.floor((Math.random() - 0.5) * 3);
     this.yVelocity = Math.floor((Math.random() - 0.5) * 3);
     this.distanceFromMouse = 100;
@@ -121,8 +121,7 @@ window.addEventListener('resize', (e) => {
   init();
 })
 
-const animate = () => {
-  requestAnimationFrame(animate);
+const process = () => {
   context.clearRect(0,0,context.canvas.width, context.canvas.height);
   for(const circle of circles) {
     circle.update(context)
@@ -130,5 +129,26 @@ const animate = () => {
   }
 }
 
-animate();
-init();
+const gameLoop = () => {
+  init();
+  let lastRender = null;
+  const animate = (timestamp) => {
+    const delta = lastRender ? timestamp - lastRender : 32;
+    const renders = Math.floor(delta /  (1000/60)); // ms passed / frames per second 
+    console.log('animating?')
+    if(renders > 0) {
+      context.fillStyle = '#000';
+      context.clearRect(0,0,context.canvas.width, context.canvas.width)
+      for(let i = 0; i < renders; i++) {
+        process()
+        lastRender = timestamp;
+      }
+    }
+
+    window.requestAnimationFrame(animate);
+  }
+  window.requestAnimationFrame(animate)
+}
+
+gameLoop();
+// init();
