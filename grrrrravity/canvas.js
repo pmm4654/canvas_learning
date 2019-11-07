@@ -29,6 +29,8 @@ class Ball {
     if(this.y > context.canvas.height - this.radius) {
       this.yVelocity = -this.yVelocity * config.friction;
     } else {
+      // speed up on the way down
+      // slow down on the way up and eventually it will start going down again
       this.yVelocity += config.gravity;
     }
     this.y += this.yVelocity;
