@@ -3,7 +3,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight * .8;
 
 const context = canvas.getContext('2d');
-// context.globalCompositeOperation  = 'soft-light';
+context.globalCompositeOperation  = 'saturation';
 const NUM_CIRCLES = 700;
 
 const mouse = {
@@ -135,7 +135,6 @@ const gameLoop = () => {
   const animate = (timestamp) => {
     const delta = lastRender ? timestamp - lastRender : 32;
     const renders = Math.floor(delta /  (1000/60)); // ms passed / frames per second 
-    console.log('animating?')
     if(renders > 0) {
       context.fillStyle = '#000';
       context.clearRect(0,0,context.canvas.width, context.canvas.width)
