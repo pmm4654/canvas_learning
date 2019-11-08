@@ -3,7 +3,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight * .8;
 
 const context = canvas.getContext('2d');
-context.globalCompositeOperation  = 'soft-light';
+// context.globalCompositeOperation  = 'soft-light';
 const NUM_CIRCLES = 700;
 
 const mouse = {
@@ -12,9 +12,9 @@ const mouse = {
 };
 
 const config = {
-  gravity: 1,
+  gravity: .1,
   friction: 0.8,
-  MAX_BALLS: 30,
+  MAX_BALLS: 90,
 }
 
 class Ball {
@@ -25,10 +25,14 @@ class Ball {
     this.color = color;
     this.yVelocity = yVelocity;
     this.deadBounces = 0;
+    this.friction = random(.6, .9)
   }
 
   update = () => {
-    if(this.deadBounces > 5) return true
+    if(this.deadBounces > 5) {
+      this.y = context.canvas.height - this.radius;
+      return true
+    } 
     if(this.y > context.canvas.height - this.radius) {
       this.yVelocity = -this.yVelocity * config.friction; // reverse the velocity (make ball go back up)
       if(this.y + this.yVelocity > context.canvas.height - this.radius) { // if it doesn't make it all the way back up
@@ -49,7 +53,19 @@ class Ball {
   draw = (context) => {
     context.beginPath();
     context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    context.fillStyle = this.color;
+    const gradient = context.createRadialGradient(
+      this.x, 
+      this.y, 
+      this.radius, 
+      this.x - (this.radius * .5), 
+      this.y - (this.radius * .5), 
+      // this.radius
+      .5
+    );
+    gradient.addColorStop(0, this.color)
+    gradient.addColorStop(.9, 'white')
+    // gradient.addColorStop(1, 'green');
+    context.fillStyle = gradient; //this.color;
     context.fill()
     context.closePath();
   }
@@ -70,11 +86,21 @@ tropicalFishPalette = [
   '#6503A6',
 ];
 
+const random = ( min, max ) => {
+	return Math.random() * ( max - min ) + min;
+}
+
 const randomColor = (colorPalette = tropicalFishPalette) => (
   colorPalette[Math.floor(Math.random() * colorPalette.length)]
 );
 
-const newBall = () => new Ball(context.canvas.width * Math.random(), context.canvas.height * Math.random() * .4, Math.random() * 40, Math.random() * 9, randomColor());
+const newBall = () => new Ball(
+  context.canvas.width * Math.random(), 
+  random(context.canvas.height * .1, context.canvas.height * Math.random() * .6), 
+  Math.random() * 40, 
+  Math.random() * 9, 
+  randomColor()
+);
 const ball = new Ball(context.canvas.width / 2, context.canvas.height / 2, 30, 2, 'red');
 
 let balls = [];
