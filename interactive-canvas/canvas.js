@@ -137,7 +137,6 @@ const gameLoop = () => {
     const renders = Math.floor(delta /  (1000/60)); // ms passed / frames per second 
     if(renders > 0) {
       context.fillStyle = '#000';
-      context.clearRect(0,0,context.canvas.width, context.canvas.width)
       for(let i = 0; i < renders; i++) {
         process()
         lastRender = timestamp;
