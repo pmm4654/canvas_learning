@@ -12,27 +12,28 @@ const mouse = {
 };
 
 const config = {
-  gravity: .1,
+  gravity: 1,
   friction: 0.8,
   MAX_BALLS: 90,
 }
 
 class Ball {
-  constructor(x, y, radius, yVelocity, color) {
+  constructor({x, y, radius, xVelocity, yVelocity, color}) {
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.color = color;
     this.yVelocity = yVelocity;
+    this.xVelocity = xVelocity;
     this.deadBounces = 0;
-    this.friction = random(.6, .9)
+    this.friction = random(.6, .99)
   }
 
   update = () => {
     if(this.deadBounces > 5) {
       this.y = context.canvas.height - this.radius;
       return true
-    } 
+    }
     if(this.y > context.canvas.height - this.radius) {
       this.yVelocity = -this.yVelocity * config.friction; // reverse the velocity (make ball go back up)
       if(this.y + this.yVelocity > context.canvas.height - this.radius) { // if it doesn't make it all the way back up
@@ -44,9 +45,21 @@ class Ball {
       // slow down on the way up and eventually it will start going down again
       this.yVelocity += config.gravity;
     }
+
+    if(this.x > context.canvas.width - this.radius || this.x < 0 + this.radius) { // if goes off the right
+      this.xVelocity = -this.xVelocity;
+      if(this.x + this.xVelocity > context.canvas.width - this.radius) {
+        this.x = context.canvas.width - this.radius
+      }
+      if(this.x + this.xVelocity < 0 + this.radius) {
+        this.x = 0 - this.radius
+      }      
+    }
     // if(this.y + this.yVelocity + this.radius > context.canvas.height) { // if it is below the canvas
     //   this.y = context.canvas.height - this.radius; // make sure it's just on the bottom
     // }
+
+    this.x += this.xVelocity;
     this.y += this.yVelocity;
   }
 
@@ -55,7 +68,7 @@ class Ball {
     context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     const gradient = context.createRadialGradient(
       this.x, 
-      this.y, 
+      this.y,
       this.radius, 
       this.x - (this.radius * .5), 
       this.y - (this.radius * .5), 
@@ -86,22 +99,27 @@ tropicalFishPalette = [
   '#6503A6',
 ];
 
-const random = ( min, max ) => {
-	return Math.random() * ( max - min ) + min;
-}
+const random = ( min, max ) => (
+	Math.random() * ( max - min ) + min
+);
 
 const randomColor = (colorPalette = tropicalFishPalette) => (
   colorPalette[Math.floor(Math.random() * colorPalette.length)]
 );
 
-const newBall = () => new Ball(
-  context.canvas.width * Math.random(), 
-  random(context.canvas.height * .1, context.canvas.height * Math.random() * .6), 
-  Math.random() * 40, 
-  Math.random() * 9, 
-  randomColor()
-);
-const ball = new Ball(context.canvas.width / 2, context.canvas.height / 2, 30, 2, 'red');
+const newBall = () => {
+  const randomY = random(context.canvas.height * .1, context.canvas.height * Math.random() * .6)
+  const ball = new Ball({
+  x: context.canvas.width * Math.random(), 
+  y: randomY, 
+  radius: Math.random() * 40, 
+  yVelocity: Math.random() * 9, 
+  xVelocity: random(-2, 2),
+  color: randomColor()
+})
+  return ball 
+};
+const ball = new Ball({x: context.canvas.width / 2, y: context.canvas.height / 2, radius: 30, yVelocity: 2, color: 'red'});
 
 let balls = [];
 
