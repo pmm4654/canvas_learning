@@ -6,6 +6,8 @@ class Sprite {
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
 
+    this.handleResize();
+
     this.width  = 64;
     this.height = 64;
     this.speed = 10;
@@ -21,6 +23,7 @@ class Sprite {
     this.dir = 'none';
 
     this.pressedKeys = {};
+    this.handleResize();
 
     this.spriteSheet.onload = () => {
       this.render();
@@ -28,6 +31,15 @@ class Sprite {
 
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('keyup', this.handleKeyUp);
+
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  handleResize = () => {
+    this.canvas.width = canvas.offsetWidth;
+    this.canvas.height = canvas.offsetHeight;
+    this.context.width = canvas.offsetWidth;
+    this.context.height = canvas.offsetHeight;
   }
 
   handleKeyDown = (e) => {
@@ -124,11 +136,4 @@ class Sprite {
 
 
 const canvas = document.getElementById('sprite');
-const ctx = canvas.getContext('2d');
-canvas.width = canvas.offsetWidth;
-canvas.height = canvas.offsetHeight;
-
-
-ctx.width = canvas.offsetWidth;
-ctx.height = canvas.offsetHeight;
 new Sprite(canvas);
