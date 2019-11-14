@@ -79,7 +79,7 @@ class Circle {
     context.fill();
   }
 
-  update = (context) => {      
+  update = (context) => {
     if(this.x > context.canvas.width - this.radius) {
       this.x = context.canvas.width - this.radius;
       this.xVelocity = -this.xVelocity;
@@ -93,14 +93,14 @@ class Circle {
     } else if(this.y - this.radius < 0) {
       this.y = this.radius;
       this.yVelocity = -this.yVelocity;
-    }      
+    }
     this.x += this.xVelocity;
     this.y += this.yVelocity;
   }
 }
 
 const newCircle = (colorPalette) => new Circle(
-  Math.floor(Math.random() * context.canvas.width), 
+  Math.floor(Math.random() * context.canvas.width),
   Math.floor(Math.random() * context.canvas.height),
   colorPalette
 );
@@ -134,10 +134,9 @@ const gameLoop = () => {
   let lastRender = null;
   const animate = (timestamp) => {
     const delta = lastRender ? timestamp - lastRender : 32;
-    const renders = Math.floor(delta /  (1000/60)); // ms passed / frames per second 
+    const renders = Math.floor(delta /  (1000/60)); // ms passed / frames per second
+    context.fillStyle = '#000';
     if(renders > 0) {
-      context.fillStyle = '#000';
-      context.clearRect(0,0,context.canvas.width, context.canvas.width)
       for(let i = 0; i < renders; i++) {
         process()
         lastRender = timestamp;
