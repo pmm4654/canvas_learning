@@ -14,7 +14,7 @@ const mouse = {
 const config = {
   gravity: .1,
   friction: 0.8,
-  MAX_PARTICLES: 4,
+  MAX_PARTICLES: 40,
 }
 
 
@@ -22,12 +22,32 @@ class Particle {
   constructor(x, y, radius, color) {
     this.x = x;
     this.y = y;
+    this.velocity = {
+      x: 5 * (Math.random() - 0.5),
+      y: 5 * (Math.random() - 0.5)
+    }
+    this.mass = 1;
     this.radius = radius;
     this.color = color;
   }
 
-  update = () => {
-
+  update = (particles) => {
+    for(let i = 0; i < particles.length; i++) {
+      if(this === particles[i]) continue;
+      const distanceBetweenCircles = distance(this.x, this.y, particles[i].x, particles[i].y)
+      const radiusOfBothCircles = this.radius + particles[i].radius;
+      if(distanceBetweenCircles - (radiusOfBothCircles)  < 0) {
+        resolveCollision(this, particles[i])
+      }    
+    }
+    if(this.x - this.radius <= 0 || this.x + this.radius >= context.canvas.width) {
+      this.velocity.x = -this.velocity.x
+    }
+    if(this.y - this.radius <= 0 || this.y + this.radius >= context.canvas.height) {
+      this.velocity.y = -this.velocity.y
+    }    
+    this.x += this.velocity.x
+    this.y += this.velocity.y
   }
 
   draw = (context) => {
@@ -59,7 +79,7 @@ tropicalFishPalette = [
 const distance = (x1, y1, x2, y2) => {
   const xDist = x2 - x1;
   const yDist = y2 - y1;
-  Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
+  return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
 }
 
 const random = ( min, max ) => {
@@ -71,7 +91,7 @@ const randomColor = (colorPalette = tropicalFishPalette) => (
 );
 
 const newParticle = () => {
-  radius = 100;
+  radius = 50;
   return new Particle(
     random(radius, context.canvas.width - radius),
     random(radius, context.canvas.height - radius),
@@ -93,7 +113,8 @@ const init = () => {
         const distanceBetweenCircles = distance(daParticle.x, daParticle.y, particles[j].x, particles[j].y)
         const radiusOfBothCircles = daParticle.radius + particles[j].radius;
         if(distanceBetweenCircles - (radiusOfBothCircles)  < 0) {
-          daParticle = newParticle();
+          daParticle.x = random(radius, context.canvas.width - radius);
+          daParticle.y = random(radius, context.canvas.height - radius);
           j = -1;
         }
       }
@@ -113,7 +134,7 @@ window.addEventListener('resize', (e) => {
 const process = () => {
   context.clearRect(0,0,context.canvas.width, context.canvas.height);
   for(let i = 0; i < particles.length; i++) {
-    particles[i].update(context);
+    particles[i].update(particles);
     particles[i].draw(context);
   }
 }
